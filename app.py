@@ -32,7 +32,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-plt.rcParams['font.sans-serif'] = ['WenQuanYi Zen Hei', 'SimHei', 'DejaVu Sans']
+plt.rcParams['font.sans-serif'] = ['WenQuanYi Zen Hei']
 plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
 
 # ==================== 加载模型 ====================
