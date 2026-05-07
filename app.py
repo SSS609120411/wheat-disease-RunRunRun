@@ -5,7 +5,9 @@ import warnings
 from backend import predict_data, get_true_labels, calculate_metrics  # 调用后端
 #新加的库
 import io
-
+plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei']
+plt.rcParams['axes.unicode_minus'] = False
+plt.rcParams['mathtext.fontset'] = 'stix'
 warnings.filterwarnings('ignore')
 st.set_page_config(page_title="小麦赤霉病反演系统", layout="wide")
 
