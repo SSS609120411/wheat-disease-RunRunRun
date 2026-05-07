@@ -2,7 +2,9 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import warnings
-from backend import predict_data  # 调用后端
+from backend import predict_data, get_true_labels, calculate_metrics  # 调用后端
+#新加的库
+import io
 
 warnings.filterwarnings('ignore')
 st.set_page_config(page_title="小麦赤霉病反演系统", layout="wide")
@@ -48,10 +50,17 @@ def main():
         DS4：偏重
         DS5：重度
         """)
+        
+        #新加的代码
+        st.markdown("---")
+        st.subheader("📈 模型精度验证")
+        val_file = st.file_uploader("上传带【样品标签】的验证文件", type=["xlsx", "csv"])
+        eval_btn = st.button("✅ 开始模型评估")
 
     # 上传
     uploaded_file = st.file_uploader("📂 上传数据文件（.xlsx / .csv）", type=['xlsx', 'xls', 'csv'])
-
+    res_df, y_pred = None, None
+    
     if uploaded_file is not None:
         try:
             # 读取文件
@@ -66,7 +75,7 @@ def main():
             # 预测按钮
             if st.button("🚀 开始预测", type="primary"):
                 with st.spinner("正在预测中，请稍候..."):
-                    res_df = predict_data(df)  # 交给后端计算
+                    res_df, y_pred = predict_data(df)  # 交给后端计算
 
                 # 展示结果
                 st.subheader("✅ 预测结果")
@@ -92,6 +101,44 @@ def main():
             st.error(f"出错：{str(e)}")
     else:
         st.info("请上传 Excel / CSV 文件")
+    
+    #新加的预测功能
+    if val_file is not None and eval_btn and y_pred is not None:
+        try:
+            df_val = pd.read_csv(val_file) if val_file.name.endswith('.csv') else pd.read_excel(val_file)
+            y_true = get_true_labels(df_val)
+            
+            # 确保长度一致
+            if len(y_true) != len(y_pred):
+                st.error("真实标签数量与预测数量不匹配！")
+            else:
+                r2, rmse = calculate_metrics(y_true, y_pred)
+                st.subheader(f"📊 模型评估结果   R² = {r2}   RMSE = {rmse}")
 
+                # 画图
+                fig, ax = plt.subplots(figsize=(8, 6), dpi=300)
+                ax.scatter(y_true, y_pred, s=15, color="#2E86AB")
+                ax.plot([y_true.min(), y_true.max()], [y_true.min(), y_true.max()], 'r--')
+                
+                # 左上角标注
+                ax.text(0.05, 0.95, f"$R^2 = {r2}$\n$RMSE = {rmse}$", 
+                        transform=ax.transAxes, fontsize=12, 
+                        verticalalignment='top', bbox=dict(boxstyle="round", facecolor="white"))
+                
+                ax.set_xlabel("真实值")
+                ax.set_ylabel("预测值")
+                st.pyplot(fig)
+
+                # 下载图片
+                buf = io.BytesIO()
+                fig.savefig(buf, dpi=300, bbox_inches='tight')
+                st.download_button("💾 下载散点图", buf, "scatter.png", "image/png")
+                
+        except Exception as e:
+            st.error(f"评估失败：{str(e)}")
+    
+    
+    
+    
 if __name__ == "__main__":
     main()
