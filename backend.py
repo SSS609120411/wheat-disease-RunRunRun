@@ -4,6 +4,8 @@ import re
 import pywt
 import joblib
 import os
+#新添加的库
+from sklearn.metrics import r2_score, mean_squared_error
 
 # ==================== 加载模型 ====================
 base_dir = os.path.dirname(__file__)
@@ -170,4 +172,13 @@ def predict_data(df):
         results.append([samples.iloc[i], round(sev,2), level, advice])
     
     res_df = pd.DataFrame(results, columns=["样本标识", "严重度(%)", "病害等级", "防治建议"])
-    return res_df
+    return res_df, preds
+
+#新加的函数，用来进行精度对比
+def get_true_labels(df):
+    return df["样品标签"].values
+
+def calculate_metrics(y_true, y_pred):
+    r2 = r2_score(y_true, y_pred)
+    rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+    return round(r2, 3), round(rmse, 3)
