@@ -11,6 +11,27 @@ import matplotlib.pyplot as plt
 warnings.filterwarnings('ignore')
 st.set_page_config(page_title="小麦赤霉病反演系统", layout="wide")
 
+#解决字体问题
+st.markdown(
+    """
+    <style>
+    /* 全局强制字体 */
+    html, body, [class*="css"] {
+        font-family: 'Microsoft YaHei', 'SimHei', 'PingFang SC', 'Noto Sans CJK SC', sans-serif;
+    }
+    /* 针对 st.dataframe 等表格内部文字 */
+    .stDataFrame, .stTable {
+        font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+    }
+    /* 确保侧边栏文字正常 */
+    .sidebar .sidebar-content {
+        font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # ==================== 加载模型 ====================
 base_dir = os.path.dirname(__file__)
 model = joblib.load(os.path.join(base_dir, 'model.pkl'))
