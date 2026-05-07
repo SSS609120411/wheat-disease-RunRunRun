@@ -33,6 +33,7 @@ def main():
     st.markdown("---")
     res_df, y_pred = None, None
     # 侧边栏
+    '''
     #初始化那个东西
     if "y_pred" not in st.session_state:
         st.session_state.y_pred = None
@@ -40,6 +41,7 @@ def main():
         st.session_state.res_df = None
     if "uploaded_file_name" not in st.session_state:
         st.session_state.uploaded_file_name = None   # 用于检测文件是否变化
+    '''
     with st.sidebar:
         st.subheader("📖 使用说明")
         st.info("""
@@ -67,15 +69,7 @@ def main():
     # 上传
     uploaded_file = st.file_uploader("📂 上传数据文件（.xlsx / .csv）", type=['xlsx', 'xls', 'csv'])
     #res_df, y_pred = None, None
-    
-    if uploaded_file is not None:
-        #新加了一个清空旧的预测结果
-        current_file_name = uploaded_file.name
-        if st.session_state.uploaded_file_name != current_file_name:
-            st.session_state.y_pred = None
-            st.session_state.res_df = None
-            st.session_state.uploaded_file_name = current_file_name
-        
+    if uploaded_file is not None:        
         try:
             # 读取文件
             if uploaded_file.name.endswith('.csv'):
@@ -90,8 +84,7 @@ def main():
             if st.button("🚀 开始预测", type="primary"):
                 with st.spinner("正在预测中，请稍候..."):
                     res_df, y_pred = predict_data(df)  # 交给后端计算
-                    st.session_state.res_df = res_df
-                    st.session_state.y_pred = y_pred
+                    
 
                 # 展示结果
                 st.subheader("✅ 预测结果")
@@ -117,12 +110,11 @@ def main():
             st.error(f"出错：{str(e)}")
     else:
         st.info("请上传 Excel / CSV 文件")
-        # 如果清空了上传文件，也要清空预测结果
-        st.session_state.y_pred = None
-        st.session_state.res_df = None
-        st.session_state.uploaded_file_name = None
+
     
     #新加的预测功能
+    #旧的逻辑
+    '''
     if val_file is not None and eval_btn:
         if st.session_state.y_pred is None:
             st.sidebar.error("请先在上方上传数据文件并点击「开始预测」，生成预测结果后再进行评估！")
@@ -133,7 +125,7 @@ def main():
                     df_val = pd.read_csv(val_file)
                 else:
                     df_val = pd.read_excel(val_file)
-
+    
                 # 获取真实标签
                 y_true = get_true_labels(df_val)
                 y_pred = st.session_state.y_pred   # 从 session 中获取
@@ -166,6 +158,48 @@ def main():
                 
             except Exception as e:
                 st.error(f"评估失败：{str(e)}")
+        '''
+    if val_file is not None and eval_btn:
+         try:
+             # 读取验证文件
+             if val_file.name.endswith('.csv'):
+                 df_val = pd.read_csv(val_file)
+             else:
+                 df_val = pd.read_excel(val_file)
+             
+             # 检查必需的列
+             if "样品标签" not in df_val.columns:
+                 st.sidebar.error("验证文件必须包含 '样品标签' 列（真实严重度值）")
+             else:
+                 # 对验证文件进行预测（使用同一个模型）
+                 with st.spinner("正在评估模型，请稍候..."):
+                     res_val, y_pred_val = predict_data(df_val)   # y_pred_val 是预测的严重度数组
+                 y_true = df_val["样品标签"].values
+                 
+                 # 长度检查
+                 if len(y_true) != len(y_pred_val):
+                     st.sidebar.error(f"真实标签数量({len(y_true)})与预测数量({len(y_pred_val)})不匹配！")
+                 else:
+                     r2, rmse = calculate_metrics(y_true, y_pred_val)
+                     st.sidebar.subheader(f"📊 模型评估结果   R² = {r2}   RMSE = {rmse}")
+                     
+                     # 散点图
+                     fig, ax = plt.subplots(figsize=(6,5), dpi=150)
+                     ax.scatter(y_true, y_pred_val, s=15, color="#2E86AB")
+                     ax.plot([y_true.min(), y_true.max()], [y_true.min(), y_true.max()], 'r--')
+                     ax.text(0.05, 0.95, f"$R^2 = {r2}$\n$RMSE = {rmse}$", 
+                             transform=ax.transAxes, fontsize=10,
+                             verticalalignment='top', bbox=dict(boxstyle="round", facecolor="white"))
+                     ax.set_xlabel("真实严重度 (%)")
+                     ax.set_ylabel("预测严重度 (%)")
+                     st.sidebar.pyplot(fig)
+                     
+                     # 下载图片
+                     buf = io.BytesIO()
+                     fig.savefig(buf, dpi=150, bbox_inches='tight')
+                     st.sidebar.download_button("💾 下载散点图", buf, "model_eval_scatter.png", "image/png")
+         except Exception as e:
+             st.sidebar.error(f"评估失败：{str(e)}") 
     
     
     
