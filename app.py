@@ -31,7 +31,7 @@ plt.rcParams['axes.unicode_minus'] = False
 def main():
     st.title("🌾 高光谱小麦赤霉病病害严重度反演软件")
     st.markdown("---")
-
+    res_df, y_pred = None, None
     # 侧边栏
     with st.sidebar:
         st.subheader("📖 使用说明")
@@ -59,7 +59,7 @@ def main():
 
     # 上传
     uploaded_file = st.file_uploader("📂 上传数据文件（.xlsx / .csv）", type=['xlsx', 'xls', 'csv'])
-    res_df, y_pred = None, None
+    #res_df, y_pred = None, None
     
     if uploaded_file is not None:
         try:
