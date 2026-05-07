@@ -32,6 +32,9 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+plt.rcParams['font.sans-serif'] = ['WenQuanYi Zen Hei', 'SimHei', 'DejaVu Sans']
+plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
+
 # ==================== 加载模型 ====================
 base_dir = os.path.dirname(__file__)
 model = joblib.load(os.path.join(base_dir, 'model.pkl'))
@@ -246,9 +249,19 @@ def main():
                 st.markdown("---")
                 st.subheader("📊 病害等级统计")
                 count = res_df["病害等级"].value_counts().sort_index()
+                '''
                 fig, ax = plt.subplots(figsize=(10,5))
                 count.plot(kind='bar', color=['green','gold','orange','red','purple','blue'], ax=ax)
                 plt.xticks(rotation=0)
+                st.pyplot(fig)
+                '''
+                #解决字体问题
+                fig, ax = plt.subplots(figsize=(10,5))
+                count.plot(kind='bar', color=['green','gold','orange','red','purple','blue'], ax=ax)
+                plt.xticks(rotation=0)
+                plt.xlabel("病害等级", fontsize=12)
+                plt.ylabel("样本数量", fontsize=12)
+                plt.title("病害等级统计", fontsize=14)
                 st.pyplot(fig)
 
         except Exception as e:
