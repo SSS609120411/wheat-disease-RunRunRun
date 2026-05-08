@@ -86,6 +86,10 @@ def main():
                 # 导出
                 csv = res_df.to_csv(index=False, encoding="utf-8-sig").encode('utf-8-sig')
                 st.download_button("💾 导出结果为CSV", csv, "预测结果.csv", "text/csv")
+                # 导出 Excel
+                excel_buf = io.BytesIO()
+                res_df.to_excel(excel_buf, index=False, engine="openpyxl")
+                st.download_button("📊 导出结果为Excel", excel_buf, "预测结果.xlsx", "application/vnd.ms-excel")
 
                 # 图表
                 st.markdown("---")
