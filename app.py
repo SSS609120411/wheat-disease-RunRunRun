@@ -35,18 +35,9 @@ def main():
     st.markdown("---")
 
     # 侧边栏导航按钮
-    with st.sidebar:
+        with st.sidebar:
         st.subheader("📌 功能导航")
-        btn_pred = st.button("🔍 预测界面")
-        btn_help = st.button("📖 使用说明")
-        btn_standard = st.button("📊 病害等级标准")
-        btn_eval = st.button("📈 模型评估")
-
-    # 页面控制
-    page = "预测"
-    if btn_help: page = "说明"
-    if btn_standard: page = "标准"
-    if btn_eval: page = "评估"
+        page = st.radio("", ["预测界面", "使用说明", "病害等级标准", "模型评估"])
 
     # ==================== 页面内容 ====================
     if page == "预测":
