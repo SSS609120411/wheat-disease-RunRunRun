@@ -35,15 +35,6 @@ def main():
     st.markdown("---")
     res_df, y_pred = None, None
     # 侧边栏
-    '''
-    #初始化那个东西
-    if "y_pred" not in st.session_state:
-        st.session_state.y_pred = None
-    if "res_df" not in st.session_state:
-        st.session_state.res_df = None
-    if "uploaded_file_name" not in st.session_state:
-        st.session_state.uploaded_file_name = None   # 用于检测文件是否变化
-    '''
     with st.sidebar:
         st.subheader("📖 使用说明")
         st.info("""
@@ -116,51 +107,7 @@ def main():
     
     #新加的预测功能
     #旧的逻辑
-    '''
-    if val_file is not None and eval_btn:
-        if st.session_state.y_pred is None:
-            st.sidebar.error("请先在上方上传数据文件并点击「开始预测」，生成预测结果后再进行评估！")
-        else:
-            try:
-                # 读取验证文件（真实标签）
-                if val_file.name.endswith('.csv'):
-                    df_val = pd.read_csv(val_file)
-                else:
-                    df_val = pd.read_excel(val_file)
-    
-                # 获取真实标签
-                y_true = get_true_labels(df_val)
-                y_pred = st.session_state.y_pred   # 从 session 中获取
-            
-                # 确保长度一致
-                if len(y_true) != len(y_pred):
-                    st.error("真实标签数量与预测数量不匹配！")
-                else:
-                    r2, rmse = calculate_metrics(y_true, y_pred)
-                    st.subheader(f"📊 模型评估结果   R² = {r2}   RMSE = {rmse}")
-
-                    # 画图
-                    fig, ax = plt.subplots(figsize=(8, 6), dpi=300)
-                    ax.scatter(y_true, y_pred, s=15, color="#2E86AB")
-                    ax.plot([y_true.min(), y_true.max()], [y_true.min(), y_true.max()], 'r--')
-                
-                    # 左上角标注
-                    ax.text(0.05, 0.95, f"$R^2 = {r2}$\n$RMSE = {rmse}$", 
-                            transform=ax.transAxes, fontsize=12, 
-                            verticalalignment='top', bbox=dict(boxstyle="round", facecolor="white"))
-                
-                    ax.set_xlabel("真实值")
-                    ax.set_ylabel("预测值")
-                    st.pyplot(fig)
-
-                    # 下载图片
-                    buf = io.BytesIO()
-                    fig.savefig(buf, dpi=300, bbox_inches='tight')
-                    st.download_button("💾 下载散点图", buf, "scatter.png", "image/png")
-                
-            except Exception as e:
-                st.error(f"评估失败：{str(e)}")
-        '''
+   
     if val_file is not None and eval_btn:
          try:
              # 读取验证文件
