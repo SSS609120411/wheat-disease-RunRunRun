@@ -106,7 +106,7 @@ def main():
                         st.pyplot(fig)
                     else:
                         # 饼图
-                        fig, ax = plt.subplots(figsize=(8,8))
+                        fig, ax = plt.subplots(figsize=(4,4))
                         colors = ['green','gold','orange','red','purple','blue']
                         count.plot(kind='pie', autopct='%1.1f%%', colors=colors[:len(count)], ax=ax)
                         ax.set_ylabel('')
