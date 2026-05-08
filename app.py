@@ -41,50 +41,82 @@ def main():
 
     # ==================== 页面内容 ====================
     if page == "预测界面":
-        # --------------- 你原来的预测界面 全部放这里 ---------------
-        uploaded_file = st.file_uploader("📂 上传数据文件（.xlsx / .csv）", type=['xlsx', 'xls', 'csv'])
-        res_df, y_pred = None, None
-        
-        if uploaded_file is not None:        
-            try:
-                if uploaded_file.name.endswith('.csv'):
-                    df = pd.read_csv(uploaded_file)
-                else:
-                    df = pd.read_excel(uploaded_file)
-
-                st.subheader("🔍 数据预览（前10行）")
-                st.dataframe(df.head(10), use_container_width=True)
-
-                if st.button("🚀 开始预测", type="primary"):
-                    with st.spinner("正在预测中，请稍候..."):
-                        res_df, y_pred = predict_data(df)
-                        st.session_state.y_pred = y_pred
-
-                    st.subheader("✅ 预测结果")
-                    st.dataframe(res_df, use_container_width=True)
-
-                    csv = res_df.to_csv(index=False, encoding="utf-8-sig").encode('utf-8-sig')
-                    st.download_button("💾 导出CSV", csv, "预测结果.csv", "text/csv")
-
-                    excel_buf = io.BytesIO()
-                    res_df.to_excel(excel_buf, index=False, engine="openpyxl")
-                    st.download_button("💾 导出Excel", excel_buf, "预测结果.xlsx")
-
-                    st.markdown("---")
-                    st.subheader("📊 病害等级统计")
-                    count = res_df["病害等级"].value_counts().sort_index()
+    uploaded_file = st.file_uploader("📂 上传数据文件（.xlsx / .csv）", type=['xlsx', 'xls', 'csv'])
+    
+    # 初始化 session_state 变量
+    if "res_df" not in st.session_state:
+        st.session_state.res_df = None
+    if "y_pred" not in st.session_state:
+        st.session_state.y_pred = None
+    if "chart_is_bar" not in st.session_state:
+        st.session_state.chart_is_bar = True   # True=柱状图, False=饼图
+    
+    if uploaded_file is not None:
+        try:
+            # 读取文件
+            if uploaded_file.name.endswith('.csv'):
+                df = pd.read_csv(uploaded_file)
+            else:
+                df = pd.read_excel(uploaded_file)
+            
+            # 上传新文件时清空旧预测结果
+            st.session_state.res_df = None
+            st.session_state.y_pred = None
+            
+            st.subheader("🔍 数据预览（前10行）")
+            st.dataframe(df.head(10), use_container_width=True)
+            
+            # 预测按钮
+            if st.button("🚀 开始预测", type="primary"):
+                with st.spinner("正在预测中，请稍候..."):
+                    res_df, y_pred = predict_data(df)
+                    st.session_state.res_df = res_df
+                    st.session_state.y_pred = y_pred
+                
+                st.subheader("✅ 预测结果")
+                st.dataframe(st.session_state.res_df, use_container_width=True)
+                
+                # 导出按钮
+                csv = st.session_state.res_df.to_csv(index=False, encoding="utf-8-sig").encode('utf-8-sig')
+                st.download_button("💾 导出CSV", csv, "预测结果.csv", "text/csv")
+                excel_buf = io.BytesIO()
+                st.session_state.res_df.to_excel(excel_buf, index=False, engine="openpyxl")
+                st.download_button("💾 导出Excel", excel_buf, "预测结果.xlsx")
+            
+            # ========== 图表展示区域（独立于预测按钮） ==========
+            if st.session_state.res_df is not None:
+                st.markdown("---")
+                st.subheader("📊 病害等级统计")
+                
+                # 切换图表类型的按钮
+                if st.button("🔄 切换图表类型", key="toggle_chart"):
+                    st.session_state.chart_is_bar = not st.session_state.chart_is_bar
+                    st.rerun()
+                
+                count = st.session_state.res_df["病害等级"].value_counts().sort_index()
+                
+                if st.session_state.chart_is_bar:
+                    # 柱状图
                     fig, ax = plt.subplots(figsize=(10,5))
                     count.plot(kind='bar', color=['green','gold','orange','red','purple','blue'], ax=ax)
                     plt.xticks(rotation=0)
                     plt.xlabel("病害等级", fontsize=12)
                     plt.ylabel("样本数量", fontsize=12)
-                    plt.title("病害等级统计", fontsize=14)
+                    plt.title("病害等级统计（柱状图）", fontsize=14)
                     st.pyplot(fig)
-
-            except Exception as e:
-                st.error(f"出错：{str(e)}")
-        else:
-            st.info("请上传 Excel / CSV 文件")
+                else:
+                    # 饼图
+                    fig, ax = plt.subplots(figsize=(8,8))
+                    colors = ['green','gold','orange','red','purple','blue']
+                    count.plot(kind='pie', autopct='%1.1f%%', colors=colors[:len(count)], ax=ax)
+                    ax.set_ylabel('')
+                    ax.set_title("病害等级统计（饼图）", fontsize=14)
+                    st.pyplot(fig)
+                    
+        except Exception as e:
+            st.error(f"出错：{str(e)}")
+    else:
+        st.info("请上传 Excel / CSV 文件")
 
     elif page == "使用说明":
         st.subheader("📖 使用说明")
