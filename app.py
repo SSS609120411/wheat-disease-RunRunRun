@@ -60,8 +60,8 @@ def main():
                     df = pd.read_excel(uploaded_file)
             
                 # 上传新文件时清空旧预测结果
-                st.session_state.res_df = None
-                st.session_state.y_pred = None
+                #st.session_state.res_df = None
+                #st.session_state.y_pred = None
                 
                 st.subheader("🔍 数据预览（前10行）")
                 st.dataframe(df.head(10), use_container_width=True)
