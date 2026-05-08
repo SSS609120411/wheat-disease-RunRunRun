@@ -35,7 +35,7 @@ def main():
     st.markdown("---")
 
     # 侧边栏导航按钮
-        with st.sidebar:
+    with st.sidebar:
         st.subheader("📌 功能导航")
         page = st.radio("", ["预测界面", "使用说明", "病害等级标准", "模型评估"])
 
