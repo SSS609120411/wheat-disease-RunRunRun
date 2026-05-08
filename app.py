@@ -89,7 +89,7 @@ def main():
                 # 导出 Excel
                 excel_buf = io.BytesIO()
                 res_df.to_excel(excel_buf, index=False, engine="openpyxl")
-                st.download_button("📊 导出结果为Excel", excel_buf, "预测结果.xlsx", "application/vnd.ms-excel")
+                st.download_button("💾 导出结果为Excel", excel_buf, "预测结果.xlsx", "application/vnd.ms-excel")
 
                 # 图表
                 st.markdown("---")
