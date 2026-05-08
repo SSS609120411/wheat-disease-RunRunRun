@@ -112,35 +112,36 @@ def main():
         run_eval = st.button("✅ 开始评估", type="primary")
 
         if val_file is not None and run_eval:
-            try:
-                if val_file.name.endswith('.csv'):
-                    df_val = pd.read_csv(val_file)
-                else:
-                    df_val = pd.read_excel(val_file)
+            with st.spinner("📊 评估中，请稍候..."):   # 这里显示提示
+                try:
+                    if val_file.name.endswith('.csv'):
+                        df_val = pd.read_csv(val_file)
+                    else:
+                        df_val = pd.read_excel(val_file)
 
-                if "样品标签" not in df_val.columns:
-                    st.error("验证文件必须包含 '样品标签' 列")
-                else:
-                    with st.spinner("评估中..."):
+                    if "样品标签" not in df_val.columns:
+                        st.error("验证文件必须包含 '样品标签' 列")
+                    else:
+                        #with st.spinner("评估中..."):
                         _, y_pred_val = predict_data(df_val)
-                    y_true = df_val["样品标签"].values
+                        y_true = df_val["样品标签"].values
 
-                    r2, rmse = calculate_metrics(y_true, y_pred_val)
-                    st.subheader(f"📊 评估结果  R²={r2}  RMSE={rmse}")
+                        r2, rmse = calculate_metrics(y_true, y_pred_val)
+                        st.subheader(f"📊 评估结果  R²={r2}  RMSE={rmse}")
+    
+                        fig, ax = plt.subplots(figsize=(8,6), dpi=300)
+                        ax.scatter(y_true, y_pred_val, s=15, color="#2E86AB")
+                        ax.plot([y_true.min(), y_true.max()], [y_true.min(), y_true.max()], 'r--')
+                        ax.text(0.05, 0.95, f"$R^2={r2}$\n$RMSE={rmse}$", transform=ax.transAxes, fontsize=12, verticalalignment="top", bbox=dict(facecolor="white"))
+                        ax.set_xlabel("真实值")
+                        ax.set_ylabel("预测值")
+                        st.pyplot(fig)
 
-                    fig, ax = plt.subplots(figsize=(8,6), dpi=300)
-                    ax.scatter(y_true, y_pred_val, s=15, color="#2E86AB")
-                    ax.plot([y_true.min(), y_true.max()], [y_true.min(), y_true.max()], 'r--')
-                    ax.text(0.05, 0.95, f"$R^2={r2}$\n$RMSE={rmse}$", transform=ax.transAxes, fontsize=12, verticalalignment="top", bbox=dict(facecolor="white"))
-                    ax.set_xlabel("真实值")
-                    ax.set_ylabel("预测值")
-                    st.pyplot(fig)
-
-                    buf = io.BytesIO()
-                    fig.savefig(buf, dpi=300, bbox_inches='tight')
-                    st.download_button("💾 下载散点图", buf, "scatter.png")
-            except Exception as e:
-                st.error(f"失败：{str(e)}")
+                        buf = io.BytesIO()
+                        fig.savefig(buf, dpi=300, bbox_inches='tight')
+                        st.download_button("💾 下载散点图", buf, "scatter.png")
+                except Exception as e:
+                    st.error(f"失败：{str(e)}")
     
     
     
