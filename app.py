@@ -40,7 +40,7 @@ def main():
         page = st.radio("", ["预测界面", "使用说明", "病害等级标准", "模型评估"])
 
     # ==================== 页面内容 ====================
-    if page == "预测":
+    if page == "预测界面":
         # --------------- 你原来的预测界面 全部放这里 ---------------
         uploaded_file = st.file_uploader("📂 上传数据文件（.xlsx / .csv）", type=['xlsx', 'xls', 'csv'])
         res_df, y_pred = None, None
@@ -86,7 +86,7 @@ def main():
         else:
             st.info("请上传 Excel / CSV 文件")
 
-    elif page == "说明":
+    elif page == "使用说明":
         st.subheader("📖 使用说明")
         st.info("""
         1. 上传包含高光谱数据的 Excel / CSV
@@ -95,7 +95,7 @@ def main():
         4. 点击开始预测即可得到结果
         """)
 
-    elif page == "标准":
+    elif page == "病害等级标准":
         st.subheader("📊 病害等级标准")
         st.success("""
         DS0：健康
@@ -106,7 +106,7 @@ def main():
         DS5：重度
         """)
 
-    elif page == "评估":
+    elif page == "模型评估":
         st.subheader("📈 模型精度评估")
         val_file = st.file_uploader("上传带【样品标签】的验证文件", type=["xlsx", "csv"])
         run_eval = st.button("✅ 开始评估", type="primary")
