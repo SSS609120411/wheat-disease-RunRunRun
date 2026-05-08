@@ -26,8 +26,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-plt.rcParams['font.sans-serif'] = ['WenQuanYi Zen Hei']
-plt.rcParams['axes.unicode_minus'] = False
+#plt.rcParams['font.sans-serif'] = ['WenQuanYi Zen Hei']
+#plt.rcParams['axes.unicode_minus'] = False
 
 # ==================== 界面主程序 ====================
 def main():
