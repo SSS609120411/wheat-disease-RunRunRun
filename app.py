@@ -97,7 +97,7 @@ def main():
                     
                     if st.session_state.chart_is_bar:
                         # 柱状图
-                        levels_order = ["DS=0", "DS=1", "DS=2", "DS=3", "DS=4", "DS=5"]
+                        levels_order = ["DS=0(无病)", "DS=1(轻微)", "DS=2(轻度)", "DS=3(中度)", "DS=4(偏重)", "DS=5(重度)"]
                         colors = ["#52c41a", "#faad14", "#ff7a45", "#f5222d", "#722ed1", "#1890ff"]
                         counts = []
                         for level in levels_order:
