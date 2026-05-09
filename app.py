@@ -97,7 +97,7 @@ def main():
                     
                     if st.session_state.chart_is_bar:
                         # 柱状图
-                        levels_order = ["DS=0(无病)", "DS=1(轻微)", "DS=2(轻度)", "DS=3(中度)", "DS=4(偏重)", "DS=5(重度)"]
+                        levels_order = ["DS=0", "DS=1", "DS=2", "DS=3", "DS=4", "DS=5"]
                         colors = ["#52c41a", "#faad14", "#ff7a45", "#f5222d", "#722ed1", "#1890ff"]
                         counts = []
                         for level in levels_order:
@@ -111,13 +111,13 @@ def main():
                             y_pos = height + 0.5 if height > 0 else 0.5
                             ax.text(bar.get_x() + bar.get_width()/2., y_pos,
                                 f'{cnt}', ha='center', va='bottom', fontsize=12, fontweight='bold')
-                        ax.set_xlabel("病害等级", fontsize=12)
-                        ax.set_ylabel("样本数量", fontsize=12)
+                        ax.set_xlabel("Disease Security", fontsize=12)
+                        ax.set_ylabel("Sample Count", fontsize=12)
                         ax.set_title("病害等级统计（柱状图）", fontsize=14)
                         #count.plot(kind='bar', color=['green','gold','orange','red','purple','blue'], ax=ax)
                         #plt.xticks(rotation=0)
-                        #plt.xlabel("病害等级", fontsize=12)
-                        #plt.ylabel("样本数量", fontsize=12)
+                        #plt.xlabel("Disease Security", fontsize=12)
+                        #plt.ylabel("Sample Count", fontsize=12)
                         #plt.title("病害等级统计（柱状图）", fontsize=14)
                         st.pyplot(fig)
                     else:
