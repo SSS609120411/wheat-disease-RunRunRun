@@ -97,12 +97,28 @@ def main():
                     
                     if st.session_state.chart_is_bar:
                         # 柱状图
+                        levels_order = ["DS=0(无病)", "DS=1(轻微)", "DS=2(轻度)", "DS=3(中度)", "DS=4(偏重)", "DS=5(重度)"]
+                        colors = ["#52c41a", "#faad14", "#ff7a45", "#f5222d", "#722ed1", "#1890ff"]
+                        counts = []
+                        for level in levels_order:
+                            cnt = (st.session_state.res_df["病害等级"] == level).sum()
+                            counts.append(cnt)
                         fig, ax = plt.subplots(figsize=(10,5))
-                        count.plot(kind='bar', color=['green','gold','orange','red','purple','blue'], ax=ax)
-                        plt.xticks(rotation=0)
-                        plt.xlabel("病害等级", fontsize=12)
-                        plt.ylabel("样本数量", fontsize=12)
-                        plt.title("病害等级统计（柱状图）", fontsize=14)
+                        bars = ax.bar(levels_order, counts, color=colors, edgecolor='black')
+                        for bar, cnt in zip(bars, counts):
+                            height = bar.get_height()
+                            # 若高度为0，将文本放在柱子底部上方一点（避免与x轴重叠）
+                            y_pos = height + 0.5 if height > 0 else 0.5
+                            ax.text(bar.get_x() + bar.get_width()/2., y_pos,
+                                f'{cnt}', ha='center', va='bottom', fontsize=12, fontweight='bold')
+                        ax.set_xlabel("病害等级", fontsize=12)
+                        ax.set_ylabel("样本数量", fontsize=12)
+                        ax.set_title("病害等级统计（柱状图）", fontsize=14)
+                        #count.plot(kind='bar', color=['green','gold','orange','red','purple','blue'], ax=ax)
+                        #plt.xticks(rotation=0)
+                        #plt.xlabel("病害等级", fontsize=12)
+                        #plt.ylabel("样本数量", fontsize=12)
+                        #plt.title("病害等级统计（柱状图）", fontsize=14)
                         st.pyplot(fig)
                     else:
                         # 饼图
